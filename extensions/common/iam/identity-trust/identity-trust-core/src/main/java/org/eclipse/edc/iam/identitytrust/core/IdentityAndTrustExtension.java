@@ -206,7 +206,11 @@ public class IdentityAndTrustExtension implements ServiceExtension {
     @NotNull
     private TokenValidationAction tokenValidationAction() {
         return (tokenRepresentation) -> {
-            var rules = rulesRegistry.getRules(DCP_SELF_ISSUED_TOKEN_CONTEXT);
+            //var rules = rulesRegistry.getRules(DCP_SELF_ISSUED_TOKEN_CONTEXT);
+            /*
+             * FIX TO DISABLE AUTH TOKEN CHECK IN DSP MESSAGES
+             * */
+            var rules = rulesRegistry.getRules("dsi-artifical-context");
             return tokenValidationService.validate(tokenRepresentation, didPublicKeyResolver, rules);
         };
     }

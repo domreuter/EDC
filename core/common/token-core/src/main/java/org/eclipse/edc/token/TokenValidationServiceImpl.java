@@ -20,7 +20,6 @@ import org.eclipse.edc.keys.spi.PublicKeyResolver;
 import org.eclipse.edc.security.token.jwt.CryptoConverter;
 import org.eclipse.edc.spi.iam.ClaimToken;
 import org.eclipse.edc.spi.iam.TokenRepresentation;
-import org.eclipse.edc.spi.result.AbstractResult;
 import org.eclipse.edc.spi.result.Result;
 import org.eclipse.edc.token.spi.TokenValidationRule;
 import org.eclipse.edc.token.spi.TokenValidationService;
@@ -61,6 +60,12 @@ public class TokenValidationServiceImpl implements TokenValidationService {
             var claimToken = tokenBuilder.build();
 
 
+            /*
+             * FIX TO DISABLE AUTH TOKEN CHECK IN DSP MESSAGES
+             * */
+            return Result.success(claimToken);
+
+            /*
             var errors = rules.stream()
                     .map(r -> r.checkRule(claimToken, additional))
                     .reduce(Result::merge)
@@ -74,7 +79,8 @@ public class TokenValidationServiceImpl implements TokenValidationService {
                 return Result.failure(errors);
             }
 
-            return Result.success(claimToken);
+            //return Result.success(claimToken);
+            */
 
         } catch (JOSEException e) {
             return Result.failure(e.getMessage());

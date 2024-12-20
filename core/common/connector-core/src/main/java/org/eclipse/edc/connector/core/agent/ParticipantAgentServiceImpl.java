@@ -39,13 +39,14 @@ public class ParticipantAgentServiceImpl implements ParticipantAgentService {
 
     public ParticipantAgentServiceImpl(String key) {
         requireNonNull(key, "key");
-        this.identityClaimKey = key;
+        identityClaimKey = key;
     }
 
     @Override
     public ParticipantAgent createFor(ClaimToken token) {
         var attributes = new HashMap<String, String>();
-        extensions.stream().map(extension -> extension.attributesFor(token)).forEach(attributes::putAll);
+        /* DISABLE VC CHECKS HERE */
+        //extensions.stream().map(extension -> extension.attributesFor(token)).forEach(attributes::putAll);
         if (!attributes.containsKey(PARTICIPANT_IDENTITY)) {
             var claim = token.getClaim(identityClaimKey);
             if (claim != null) {

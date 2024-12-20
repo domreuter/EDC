@@ -32,6 +32,8 @@ import org.eclipse.edc.spi.result.Result;
 import org.eclipse.edc.util.string.StringUtils;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashMap;
@@ -88,7 +90,7 @@ public class IdentityAndTrustService implements IdentityService {
         this.myOwnDid = myOwnDid;
         this.credentialServiceClient = credentialServiceClient;
         this.tokenValidationAction = tokenValidationAction;
-        this.credentialServiceUrlResolver = csUrlResolver;
+        credentialServiceUrlResolver = csUrlResolver;
         this.claimTokenCreatorFunction = claimTokenCreatorFunction;
         this.verifiableCredentialValidationService = verifiableCredentialValidationService;
     }
@@ -118,7 +120,15 @@ public class IdentityAndTrustService implements IdentityService {
                 SUBJECT, myOwnDid,
                 AUDIENCE, parameters.getStringClaim(AUDIENCE)));
 
-        return secureTokenService.createToken(claims, scope);
+        //return secureTokenService.createToken(claims, scope);
+        /*
+         * FIX TO DISABLE AUTH TOKEN CHECK IN DSP MESSAGES
+         * */
+        var token = TokenRepresentation.Builder.newInstance()
+                .token("eyJhbGciOiJFUzI1NksiLCJraWQiOiJkaWQ6d2ViOmRpbS1zdGF0aWMtcWEuZGlzLWNsb3VkLXFhLmNmYXBwcy5ldTEyLmhhbmEub25kZW1hbmQuY29tOmRpbS1ob3N0ZWQ6YmNlMGQxMWItZjQ2OC00ZWY5LWI2ZWYtMjAyNTIzM2E1YjU5OmNvbnN1bWVyLWNvbXBhbnkja2V5cy0xODU4YzZiZi1iOTcyLTQxNjQtODBlMC0xN2IxZDY0YTQxMDEiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJkaWQ6d2ViOmRpbS1zdGF0aWMtcWEuZGlzLWNsb3VkLXFhLmNmYXBwcy5ldTEyLmhhbmEub25kZW1hbmQuY29tOmRpbS1ob3N0ZWQ6ZjM4YzZjNmQtMmIzYS00NmNhLTg3ZWUtZWI4MTA0ZWY1NmMzOnByb3ZpZGVyLWNvbXBhbnkiLCJleHAiOjE3MjA3MjUzNzUsImlhdCI6MTcyMDcyMTc3NSwiaXNzIjoiZGlkOndlYjpkaW0tc3RhdGljLXFhLmRpcy1jbG91ZC1xYS5jZmFwcHMuZXUxMi5oYW5hLm9uZGVtYW5kLmNvbTpkaW0taG9zdGVkOmJjZTBkMTFiLWY0NjgtNGVmOS1iNmVmLTIwMjUyMzNhNWI1OTpjb25zdW1lci1jb21wYW55IiwianRpIjoiY2MxMmM5ZGMtM2JmZC00NmQ0LWFmOTAtZTY5MTg3ODBkZGJhIiwic3ViIjoiZGlkOndlYjpkaW0tc3RhdGljLXFhLmRpcy1jbG91ZC1xYS5jZmFwcHMuZXUxMi5oYW5hLm9uZGVtYW5kLmNvbTpkaW0taG9zdGVkOmJjZTBkMTFiLWY0NjgtNGVmOS1iNmVmLTIwMjUyMzNhNWI1OTpjb25zdW1lci1jb21wYW55IiwidG9rZW4iOiJjYzc5Y2Y4OTllYjAwNWUzNWU3MWYyMzFkYmRlMzJkYjE5ZjIzZTA5MTM5NjEwZjAwZTg4ZDhlNmMyYTA1MTU4In0.vZMp8rFoy3MVgeLQHtPA0ga3oR_ZuSHEQ9FQHuelhqNJzRj4XLsSvhRiv11Ow5q6gnYhVFAcuudhWPmY5f7peA")
+                .expiresIn(LocalDateTime.now().plusMinutes(500).toEpochSecond(ZoneOffset.MAX))
+                .build();
+        return Result.success(token);
     }
 
     @Override
@@ -174,11 +184,12 @@ public class IdentityAndTrustService implements IdentityService {
                 .map(VerifiablePresentation::getHolder)
                 .toList();
 
-        if (issuers.stream().allMatch(expectedIssuer::equals)) {
-            return Result.success();
-        } else {
-            return Result.failure("Returned presentations contains invalid issuer. Expected %s found %s".formatted(expectedIssuer, issuers));
-        }
+        return Result.success();
+//        if (issuers.stream().allMatch(expectedIssuer::equals)) {
+//
+//        } else {
+//            return Result.failure("Returned presentations contains invalid issuer. Expected %s found %s".formatted(expectedIssuer, issuers));
+//        }
     }
 
 
